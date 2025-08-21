@@ -2,9 +2,16 @@ let currMoleTile;
 let currPlantTile;
 let score = 0;
 let gameOver = false;
+let gameStarted = false;
+let moleInterval;
+let plantInterval;
 
 window.onload = function() {
     setGame();
+    document.getElementById("startBtn").addEventListener("click", startGame);
+    document.getElementById("restartBtn").addEventListener("click", restartGame);
+    // Disable restart button initially
+    document.getElementById("restartBtn").disabled = true;
 }
 
 function setGame() {
@@ -16,8 +23,7 @@ function setGame() {
         tile.addEventListener("click", selectTile);
         document.getElementById("board").appendChild(tile);
     }
-    setInterval(setMole, 1000); // 1000 miliseconds = 1 second, every 1 second call setMole
-    setInterval(setPlant, 2000); // 2000 miliseconds = 2 seconds, every 2 second call setPlant
+    // Don't start intervals automatically - wait for start button
 }
 
 function getRandomTile() {
@@ -27,7 +33,7 @@ function getRandomTile() {
 }
 
 function setMole() {
-    if (gameOver) {
+    if (!gameStarted || gameOver) {
         return;
     }
     if (currMoleTile) {
@@ -42,10 +48,17 @@ function setMole() {
     }
     currMoleTile = document.getElementById(num);
     currMoleTile.appendChild(mole);
+    
+    // Add animation class
+    setTimeout(() => {
+        if (mole.parentNode === currMoleTile) {
+            mole.classList.add("pop-up");
+        }
+    }, 10);
 }
 
 function setPlant() {
-    if (gameOver) {
+    if (!gameStarted || gameOver) {
         return;
     }
     if (currPlantTile) {
@@ -60,6 +73,13 @@ function setPlant() {
     }
     currPlantTile = document.getElementById(num);
     currPlantTile.appendChild(plant);
+    
+    // Add animation class
+    setTimeout(() => {
+        if (plant.parentNode === currPlantTile) {
+            plant.classList.add("pop-up");
+        }
+    }, 10);
 }
 
 function selectTile() {
@@ -74,4 +94,51 @@ function selectTile() {
         document.getElementById("score").innerText = "GAME OVER: " + score.toString(); //update score html
         gameOver = true;
     }
+}
+
+function startGame() {
+    if (gameStarted) return;
+    
+    gameStarted = true;
+    gameOver = false;
+    score = 0;
+    document.getElementById("score").innerText = score.toString();
+    document.getElementById("startBtn").disabled = true;
+    document.getElementById("restartBtn").disabled = false;
+    
+    // Clear any existing intervals
+    if (moleInterval) clearInterval(moleInterval);
+    if (plantInterval) clearInterval(plantInterval);
+    
+    // Start the game intervals
+    moleInterval = setInterval(setMole, 1000); // 1000 milliseconds = 1 second
+    plantInterval = setInterval(setPlant, 2000); // 2000 milliseconds = 2 seconds
+    
+    // Clear any existing moles or plants
+    if (currMoleTile) currMoleTile.innerHTML = "";
+    if (currPlantTile) currPlantTile.innerHTML = "";
+    
+    currMoleTile = null;
+    currPlantTile = null;
+}
+
+function restartGame() {
+    // Clear any existing intervals
+    if (moleInterval) clearInterval(moleInterval);
+    if (plantInterval) clearInterval(plantInterval);
+    
+    // Clear any existing moles or plants
+    if (currMoleTile) currMoleTile.innerHTML = "";
+    if (currPlantTile) currPlantTile.innerHTML = "";
+    
+    currMoleTile = null;
+    currPlantTile = null;
+    
+    // Reset game state
+    gameStarted = false;
+    gameOver = false;
+    score = 0;
+    document.getElementById("score").innerText = score.toString();
+    document.getElementById("startBtn").disabled = false;
+    document.getElementById("restartBtn").disabled = true;
 }

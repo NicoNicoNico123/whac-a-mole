@@ -1,0 +1,23 @@
+{
+  "name": "whac-a-mole",
+  "version": "1.0.0",
+  "description": "A Mario-themed Whac-A-Mole game built with HTML, CSS, and JavaScript",
+  "main": "mole.js",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "keywords": [
+    "game",
+    "whac-a-mole",
+    "javascript",
+    "html5",
+    "css3"
+  ],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "vite": "^4.0.0"
+  }
+}

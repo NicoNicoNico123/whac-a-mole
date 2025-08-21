@@ -5,6 +5,31 @@ body {
     background-size: cover;
 }
 
+#controls {
+    margin: 20px 0;
+}
+
+#startBtn, #restartBtn {
+    background-color: #e52521;
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    margin: 0 10px;
+    font-size: 18px;
+    border-radius: 30px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+#startBtn:hover, #restartBtn:hover {
+    background-color: #b31e1a;
+}
+
+#startBtn:disabled, #restartBtn:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+}
+
 #board {
     width: 540px;
     height: 540px;
@@ -38,4 +63,33 @@ body {
     -webkit-user-drag: none;
     -webkit-user-select: none;
     -ms-user-select: none;
+    
+    /* Animation properties */
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+#board div img.show {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Keyframes for pop-up animation */
+@keyframes popUp {
+    0% {
+        opacity: 0;
+        transform: scale(0.5) translateY(30px);
+    }
+    70% {
+        transform: scale(1.1) translateY(-10px);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+.pop-up {
+    animation: popUp 0.4s ease-out forwards;
 }
