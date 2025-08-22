@@ -6,5 +6,10 @@ export default {
   },
   server: {
     open: true
+  },
+  resolve: {
+    alias: {
+      '@': './src'
+    }
   }
 }

@@ -1,40 +1,8 @@
-// Firebase configuration - loads from environment variables with fallbacks
-const firebaseConfig = {
-  apiKey: import.meta.env.VITE_FIREBASE_APIKEY || import.meta.env.FIREBASE_APIKEY,
-  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || import.meta.env.FIREBASE_AUTH_DOMAIN,
-  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID || import.meta.env.FIREBASE_PROJECT_ID,
-  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET || import.meta.env.FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID || import.meta.env.FIREBASE_MESSAGING_SENDER_ID,
-  appId: import.meta.env.VITE_FIREBASE_APP_ID || import.meta.env.FIREBASE_APP_ID,
-  measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID || import.meta.env.FIREBASE_MEASUREMENT_ID
-};
+// Import Firebase configuration and database instance
+import { db, isFirebaseConfigComplete } from './firebase.js';
 
-// Check if Firebase config is complete before initializing
-const isFirebaseConfigComplete = firebaseConfig.apiKey && 
-                                firebaseConfig.authDomain && 
-                                firebaseConfig.projectId && 
-                                firebaseConfig.storageBucket && 
-                                firebaseConfig.messagingSenderId && 
-                                firebaseConfig.appId;
-
-if (isFirebaseConfigComplete) {
-  // Initialize Firebase
-  firebase.initializeApp(firebaseConfig);
-  const db = firebase.firestore();
-} else {
-  console.warn('Firebase configuration incomplete. Leaderboard features will be disabled.');
-  // Create a mock db object for when Firebase is not available
-  const db = {
-    collection: () => ({
-      add: () => Promise.resolve(),
-      orderBy: () => ({
-        limit: () => ({
-          get: () => Promise.resolve({ docs: [] })
-        })
-      })
-    })
-  };
-}
+// Import Firestore functions
+import { collection, query, orderBy, limit, onSnapshot, addDoc, serverTimestamp } from "firebase/firestore";
 
 let currCharacterPTile;
 let currCharacterGTile;
@@ -428,18 +396,16 @@ function setupLeaderboard() {
     document.getElementById("save-score").addEventListener("click", saveScore);
     
     // Set up real-time listener for leaderboard updates
-    db.collection('leaderboard')
-        .orderBy('score', 'desc')
-        .limit(10)
-        .onSnapshot((querySnapshot) => {
-            const leaderboard = [];
-            querySnapshot.forEach((doc) => {
-                leaderboard.push(doc.data());
-            });
-            displayLeaderboard(leaderboard);
-        }, (error) => {
-            console.error("Error listening to leaderboard:", error);
+    const q = query(collection(db, 'leaderboard'), orderBy('score', 'desc'), limit(10));
+    const unsubscribe = onSnapshot(q, (querySnapshot) => {
+        const leaderboard = [];
+        querySnapshot.forEach((doc) => {
+            leaderboard.push(doc.data());
         });
+        displayLeaderboard(leaderboard);
+    }, (error) => {
+        console.error("Error listening to leaderboard:", error);
+    });
 }
 
 function loadLeaderboard() {
@@ -479,10 +445,10 @@ function saveScore() {
     }
     
     // Save to Firestore
-    db.collection('leaderboard').add({
+    addDoc(collection(db, 'leaderboard'), {
         name: name,
         score: finalScore,
-        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+        timestamp: serverTimestamp()
     })
     .then(() => {
         // Mark score as saved

@@ -1,5 +1,6 @@
 {
   "name": "whac-a-mole",
+  "homepage": "https://niconiconico123.github.io/whac-a-mole",
   "version": "1.0.0",
   "description": "A Mario-themed Whac-A-Mole game built with HTML, CSS, and JavaScript",
   "main": "mole.js",
