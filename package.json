@@ -3,7 +3,7 @@
   "homepage": "https://niconiconico123.github.io/whac-a-mole",
   "version": "1.0.0",
   "description": "A Mario-themed Whac-A-Mole game built with HTML, CSS, and JavaScript",
-  "main": "mole.js",
+  "main": "src/main.js",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
@@ -19,9 +19,9 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "vite": "^4.0.0"
+    "vite": "^5.0.0"
   },
   "dependencies": {
-    "firebase": "^12.1.0"
+    "firebase": "^10.0.0"
   }
 }

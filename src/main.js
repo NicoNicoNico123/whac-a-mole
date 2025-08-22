@@ -103,7 +103,7 @@ function setCharacterP() {
         currCharacterPTile.innerHTML = "";
     }
     let characterP = document.createElement("img");
-    characterP.src = "./assets/characterP_nor.png";
+    characterP.src = "/characterP_nor.png";
 
     let num = getRandomTile();
     if (currCharacterGTile && currCharacterGTile.id == num) {
@@ -134,7 +134,7 @@ function setCharacterG() {
         currCharacterGTile.innerHTML = "";
     }
     let characterG = document.createElement("img");
-    characterG.src = "./assets/characterG_nor.png";
+    characterG.src = "/characterG_nor.png";
 
     let num = getRandomTile();
     if (currCharacterPTile && currCharacterPTile.id == num) {
@@ -174,12 +174,12 @@ function selectTile() {
         
         // Change characterP to angry version
         if (currCharacterPTile && currCharacterPTile.firstChild) {
-            currCharacterPTile.firstChild.src = "./assets/characterP_angry.png";
+            currCharacterPTile.firstChild.src = "/characterP_angry.png";
             
             // Reset characterP image after a delay
             setTimeout(() => {
                 if (currCharacterPTile && currCharacterPTile.firstChild) {
-                    currCharacterPTile.firstChild.src = "./assets/characterP_nor.png";
+                    currCharacterPTile.firstChild.src = "/characterP_nor.png";
                 }
             }, 300);
         }
@@ -195,17 +195,17 @@ function selectTile() {
             
             // Change characterG to happy version
             if (currCharacterGTile && currCharacterGTile.firstChild) {
-                currCharacterGTile.firstChild.src = "./assets/characterG_happy.png";
+                currCharacterGTile.firstChild.src = "/characterG_happy.png";
             }
             
             // Change characterP to angry version
             if (currCharacterPTile && currCharacterPTile.firstChild) {
-                currCharacterPTile.firstChild.src = "./assets/characterP_angry.png";
+                currCharacterPTile.firstChild.src = "/characterP_angry.png";
                 
                 // Reset characterP image after a delay
                 setTimeout(() => {
                     if (currCharacterPTile && currCharacterPTile.firstChild) {
-                        currCharacterPTile.firstChild.src = "./assets/characterP_nor.png";
+                        currCharacterPTile.firstChild.src = "/characterP_nor.png";
                     }
                 }, 300);
             }
@@ -213,7 +213,7 @@ function selectTile() {
             // Reset characterG to normal after a delay
             setTimeout(() => {
                 if (currCharacterGTile && currCharacterGTile.firstChild) {
-                    currCharacterGTile.firstChild.src = "./assets/characterG_nor.png";
+                    currCharacterGTile.firstChild.src = "/characterG_nor.png";
                 }
             }, 1000);
         } else if (currCharacterGTile && currCharacterGTile.firstChild && 
@@ -224,12 +224,12 @@ function selectTile() {
             
             // Change characterP to angry version
             if (currCharacterPTile && currCharacterPTile.firstChild) {
-                currCharacterPTile.firstChild.src = "./assets/characterP_angry.png";
+                currCharacterPTile.firstChild.src = "/characterP_angry.png";
                 
                 // Reset characterP image after a delay
                 setTimeout(() => {
                     if (currCharacterPTile && currCharacterPTile.firstChild) {
-                        currCharacterPTile.firstChild.src = "./assets/characterP_nor.png";
+                        currCharacterPTile.firstChild.src = "/characterP_nor.png";
                     }
                 }, 300);
             }
@@ -237,7 +237,7 @@ function selectTile() {
             // Reset characterG to normal after a delay
             setTimeout(() => {
                 if (currCharacterGTile && currCharacterGTile.firstChild) {
-                    currCharacterGTile.firstChild.src = "./assets/characterG_nor.png";
+                    currCharacterGTile.firstChild.src = "/characterG_nor.png";
                 }
             }, 1000);
         }

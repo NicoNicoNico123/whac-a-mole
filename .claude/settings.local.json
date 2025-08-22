@@ -8,7 +8,10 @@
       "Bash(grep:*)",
       "Bash(npm run build)",
       "Bash(cat:*)",
-      "Bash(npm run dev)"
+      "Bash(npm run dev)",
+      "WebFetch(domain:vitejs.dev)",
+      "Bash(npx:*)",
+      "Bash(npm run preview)"
     ],
     "deny": [],
     "ask": []
