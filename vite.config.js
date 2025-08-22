@@ -1,5 +1,5 @@
 export default {
-  base: '/',
+  base: '/whac-a-mole/',
   root: './',
   build: {
     outDir: './dist'
