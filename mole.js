@@ -1,12 +1,12 @@
-// Firebase configuration
+// Firebase configuration - loads only from environment variables
 const firebaseConfig = {
-  apiKey: import.meta.env.VITE_FIREBASE_API_KEY || import.meta.env.FIREBASE_APIKEY || "AIzaSyBL8O3QL6eNDibwY6LMJaI9fmUAbujIVJE",
-  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || "whac-a-g-spot.firebaseapp.com",
-  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID || "whac-a-g-spot",
-  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET || "whac-a-g-spot.firebasestorage.app",
-  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID || "934482651756",
-  appId: import.meta.env.VITE_FIREBASE_APP_ID || "1:934482651756:web:6bdee2e7f28e38e7ccc649",
-  measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID || "G-VBGNLCNXBL"
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY || import.meta.env.FIREBASE_APIKEY,
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+  appId: import.meta.env.VITE_FIREBASE_APP_ID,
+  measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID
 };
 
 // Initialize Firebase

@@ -1,18 +1,22 @@
 # Environment Variables Setup
 
-This project supports loading Firebase configuration from environment variables for both local development and production deployments.
+This project requires Firebase configuration to be loaded from environment variables. **No hardcoded fallback values are provided**, ensuring security best practices.
 
-## Environment Variable Loading Order
+## Required Environment Variables
 
-The Firebase configuration loads environment variables in this priority order:
-
-1. `VITE_FIREBASE_*` variables (for local .env files)
-2. `FIREBASE_*` variables (for GitHub Actions/secrets)
-3. Default hardcoded values (fallback)
+| Variable Name | Description | Required |
+|---------------|-------------|----------|
+| `VITE_FIREBASE_API_KEY` or `FIREBASE_APIKEY` | Firebase API Key | Yes |
+| `VITE_FIREBASE_AUTH_DOMAIN` or `FIREBASE_AUTH_DOMAIN` | Firebase Auth Domain | Yes |
+| `VITE_FIREBASE_PROJECT_ID` or `FIREBASE_PROJECT_ID` | Firebase Project ID | Yes |
+| `VITE_FIREBASE_STORAGE_BUCKET` or `FIREBASE_STORAGE_BUCKET` | Firebase Storage Bucket | Yes |
+| `VITE_FIREBASE_MESSAGING_SENDER_ID` or `FIREBASE_MESSAGING_SENDER_ID` | Firebase Messaging Sender ID | Yes |
+| `VITE_FIREBASE_APP_ID` or `FIREBASE_APP_ID` | Firebase App ID | Yes |
+| `VITE_FIREBASE_MEASUREMENT_ID` or `FIREBASE_MEASUREMENT_ID` | Firebase Measurement ID | No |
 
 ## Local Development Setup
 
-### Option 1: Using .env file (Recommended)
+### Using .env.local file (Recommended)
 1. Copy `.env.local.example` to `.env.local`:
    ```bash
    cp .env.local.example .env.local
@@ -20,15 +24,10 @@ The Firebase configuration loads environment variables in this priority order:
 
 2. Edit `.env.local` and add your actual Firebase configuration values
 
-3. The variables will be automatically loaded when you run the development server
-
-### Option 2: System Environment Variables
-Set environment variables in your shell:
-```bash
-export VITE_FIREBASE_API_KEY="your_api_key"
-export VITE_FIREBASE_AUTH_DOMAIN="your_project.firebaseapp.com"
-# ... other variables
-```
+3. The variables will be automatically loaded when you run the development server:
+   ```bash
+   npm run dev
+   ```
 
 ## GitHub Actions Deployment
 
@@ -50,20 +49,21 @@ In your GitHub Actions workflow, reference them like this:
 env:
   FIREBASE_APIKEY: ${{ secrets.FIREBASE_APIKEY }}
   FIREBASE_AUTH_DOMAIN: ${{ secrets.FIREBASE_AUTH_DOMAIN }}
-  # ... other variables
+  FIREBASE_PROJECT_ID: ${{ secrets.FIREBASE_PROJECT_ID }}
+  FIREBASE_STORAGE_BUCKET: ${{ secrets.FIREBASE_STORAGE_BUCKET }}
+  FIREBASE_MESSAGING_SENDER_ID: ${{ secrets.FIREBASE_MESSAGING_SENDER_ID }}
+  FIREBASE_APP_ID: ${{ secrets.FIREBASE_APP_ID }}
+  FIREBASE_MEASUREMENT_ID: ${{ secrets.FIREBASE_MEASUREMENT_ID }}
 ```
 
-## Available Environment Variables
+## Environment Variable Loading Priority
 
-| Variable Name | Description | Required |
-|---------------|-------------|----------|
-| `VITE_FIREBASE_API_KEY` or `FIREBASE_APIKEY` | Firebase API Key | Yes |
-| `VITE_FIREBASE_AUTH_DOMAIN` or `FIREBASE_AUTH_DOMAIN` | Firebase Auth Domain | Yes |
-| `VITE_FIREBASE_PROJECT_ID` or `FIREBASE_PROJECT_ID` | Firebase Project ID | Yes |
-| `VITE_FIREBASE_STORAGE_BUCKET` or `FIREBASE_STORAGE_BUCKET` | Firebase Storage Bucket | Yes |
-| `VITE_FIREBASE_MESSAGING_SENDER_ID` or `FIREBASE_MESSAGING_SENDER_ID` | Firebase Messaging Sender ID | Yes |
-| `VITE_FIREBASE_APP_ID` or `FIREBASE_APP_ID` | Firebase App ID | Yes |
-| `VITE_FIREBASE_MEASUREMENT_ID` or `FIREBASE_MEASUREMENT_ID` | Firebase Measurement ID | No |
+The Firebase configuration loads environment variables in this priority order:
+
+1. `VITE_FIREBASE_*` variables (for local .env files)
+2. `FIREBASE_*` variables (for GitHub Actions/secrets)
+
+**Note**: There are no hardcoded fallback values. If environment variables are not provided, Firebase initialization will fail.
 
 ## Security Best Practices
 
@@ -80,7 +80,7 @@ env:
 2. Check that .env files are in the correct location (project root)
 3. Verify that variables are properly exported in GitHub Actions
 
-### Firebase Authentication Errors
+### Firebase Initialization Errors
 1. Check that all required environment variables are set
 2. Verify that your Firebase project settings are correct
 3. Ensure your Firebase security rules allow the required operations
