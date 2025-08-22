@@ -1,5 +1,20 @@
-let currMoleTile;
-let currPlantTile;
+// Firebase configuration
+const firebaseConfig = {
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY || import.meta.env.FIREBASE_APIKEY || "AIzaSyBL8O3QL6eNDibwY6LMJaI9fmUAbujIVJE",
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || "whac-a-g-spot.firebaseapp.com",
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID || "whac-a-g-spot",
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET || "whac-a-g-spot.firebasestorage.app",
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID || "934482651756",
+  appId: import.meta.env.VITE_FIREBASE_APP_ID || "1:934482651756:web:6bdee2e7f28e38e7ccc649",
+  measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID || "G-VBGNLCNXBL"
+};
+
+// Initialize Firebase
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+
+let currCharacterPTile;
+let currCharacterGTile;
 let score = 0;
 let gameOver = false;
 let gameStarted = false;
@@ -10,6 +25,8 @@ let boardElement;
 let gameTimer;
 let timeLeft = 30; // 30 seconds game time
 let feverMode = false; // Track if we're in fever mode
+let finalScore = 0; // Store final score for leaderboard
+let scoreSaved = false; // Track if score has been saved
 
 window.onload = function() {
     setGame();
@@ -24,16 +41,24 @@ window.onload = function() {
     
     // Set up custom cursor
     setupCustomCursor();
+    
+    // Set up leaderboard
+    setupLeaderboard();
 }
 
 function setGame() {
     //set up the grid in html
+    const board = document.getElementById("board");
+    board.innerHTML = ""; // Clear any existing content
+    
     for (let i = 0; i < 9; i++) { //i goes from 0 to 8, stops at 9
         //<div id="0-8"></div>
         let tile = document.createElement("div");
         tile.id = i.toString();
         tile.addEventListener("click", selectTile);
-        document.getElementById("board").appendChild(tile);
+        // Add some styling to ensure the tile is visible and clickable
+        tile.style.cssText = "cursor: pointer; position: relative; z-index: 2;";
+        board.appendChild(tile);
     }
     // Don't start intervals automatically - wait for start button
 }
@@ -51,8 +76,8 @@ function setupCustomCursor() {
     
     // Move custom cursor with mouse
     boardElement.addEventListener("mousemove", function(e) {
-        customCursor.style.left = e.pageX + "px";
-        customCursor.style.top = e.pageY + "px";
+        customCursor.style.left = e.clientX + "px";
+        customCursor.style.top = e.clientY + "px";
     });
     
     // Animate cursor on click
@@ -79,52 +104,64 @@ function getRandomTile() {
     return num.toString();
 }
 
-function setMole() {
+function setCharacterP() {
     if (!gameStarted || gameOver) {
         return;
     }
-    if (currMoleTile) {
-        currMoleTile.innerHTML = "";
+    if (currCharacterPTile) {
+        currCharacterPTile.innerHTML = "";
     }
-    let mole = document.createElement("img");
-    mole.src = "./assets/characterP_nor.png";
+    let characterP = document.createElement("img");
+    characterP.src = "./assets/characterP_nor.png";
 
     let num = getRandomTile();
-    if (currPlantTile && currPlantTile.id == num) {
+    if (currCharacterGTile && currCharacterGTile.id == num) {
         return;
     }
-    currMoleTile = document.getElementById(num);
-    currMoleTile.appendChild(mole);
+    currCharacterPTile = document.getElementById(num);
+    
+    // Check if element exists
+    if (!currCharacterPTile) {
+        return;
+    }
+    
+    currCharacterPTile.appendChild(characterP);
     
     // Add animation class
     setTimeout(() => {
-        if (mole.parentNode === currMoleTile) {
-            mole.classList.add("pop-up");
+        if (characterP.parentNode === currCharacterPTile) {
+            characterP.classList.add("pop-up");
         }
     }, 10);
 }
 
-function setPlant() {
+function setCharacterG() {
     if (!gameStarted || gameOver) {
         return;
     }
-    if (currPlantTile) {
-        currPlantTile.innerHTML = "";
+    if (currCharacterGTile) {
+        currCharacterGTile.innerHTML = "";
     }
-    let plant = document.createElement("img");
-    plant.src = "./assets/characterG_nor.png";
+    let characterG = document.createElement("img");
+    characterG.src = "./assets/characterG_nor.png";
 
     let num = getRandomTile();
-    if (currMoleTile && currMoleTile.id == num) {
+    if (currCharacterPTile && currCharacterPTile.id == num) {
         return;
     }
-    currPlantTile = document.getElementById(num);
-    currPlantTile.appendChild(plant);
+    currCharacterGTile = document.getElementById(num);
+    
+    // Check if element exists
+    if (!currCharacterGTile) {
+        return;
+    }
+    
+    currCharacterGTile.appendChild(characterG);
     
     // Add animation class
     setTimeout(() => {
-        if (plant.parentNode === currPlantTile) {
-            plant.classList.add("pop-up");
+        if (characterG.parentNode === currCharacterGTile) {
+            characterG.classList.add("pop-up");
         }
     }, 10);
 }
@@ -137,79 +174,79 @@ function selectTile() {
     // Determine point value based on fever mode
     let pointValue = feverMode ? 20 : 10;
     
-    // Check if we're hitting the mole (characterP_nor)
-    if (this == currMoleTile) {
-        // Hit the mole - show angry mole and deduct points
+    // Check if we're hitting the characterP (characterP_nor)
+    if (this == currCharacterPTile) {
+        // Hit the characterP - show angry characterP and deduct points
         score -= pointValue;
         if (score < 0) score = 0; // Don't let score go below 0
         document.getElementById("score").innerText = score.toString(); //update score html
         
-        // Change mole to angry version
-        if (currMoleTile && currMoleTile.firstChild) {
-            currMoleTile.firstChild.src = "./assets/characterP_angry.png";
+        // Change characterP to angry version
+        if (currCharacterPTile && currCharacterPTile.firstChild) {
+            currCharacterPTile.firstChild.src = "./assets/characterP_angry.png";
             
-            // Reset mole image after a delay
+            // Reset characterP image after a delay
             setTimeout(() => {
-                if (currMoleTile && currMoleTile.firstChild) {
-                    currMoleTile.firstChild.src = "./assets/characterP_nor.png";
+                if (currCharacterPTile && currCharacterPTile.firstChild) {
+                    currCharacterPTile.firstChild.src = "./assets/characterP_nor.png";
                 }
             }, 300);
         }
     }
-    // Check if we're hitting the plant (normal or happy)
-    else if (this == currPlantTile) {
-        // Check if it's the normal plant (characterG_nor)
-        if (currPlantTile && currPlantTile.firstChild && 
-            currPlantTile.firstChild.src.includes("characterG_nor")) {
-            // Hit the normal plant - add score and show happy version
+    // Check if we're hitting the characterG (normal or happy)
+    else if (this == currCharacterGTile) {
+        // Check if it's the normal characterG (characterG_nor)
+        if (currCharacterGTile && currCharacterGTile.firstChild && 
+            currCharacterGTile.firstChild.src.includes("characterG_nor")) {
+            // Hit the normal characterG - add score and show happy version
             score += pointValue;
             document.getElementById("score").innerText = score.toString(); //update score html
             
-            // Change plant to happy version
-            if (currPlantTile && currPlantTile.firstChild) {
-                currPlantTile.firstChild.src = "./assets/characterG_happy.png";
+            // Change characterG to happy version
+            if (currCharacterGTile && currCharacterGTile.firstChild) {
+                currCharacterGTile.firstChild.src = "./assets/characterG_happy.png";
             }
             
-            // Change mole to angry version
-            if (currMoleTile && currMoleTile.firstChild) {
-                currMoleTile.firstChild.src = "./assets/characterP_angry.png";
+            // Change characterP to angry version
+            if (currCharacterPTile && currCharacterPTile.firstChild) {
+                currCharacterPTile.firstChild.src = "./assets/characterP_angry.png";
                 
-                // Reset mole image after a delay
+                // Reset characterP image after a delay
                 setTimeout(() => {
-                    if (currMoleTile && currMoleTile.firstChild) {
-                        currMoleTile.firstChild.src = "./assets/characterP_nor.png";
+                    if (currCharacterPTile && currCharacterPTile.firstChild) {
+                        currCharacterPTile.firstChild.src = "./assets/characterP_nor.png";
                     }
                 }, 300);
             }
             
-            // Reset plant to normal after a delay
+            // Reset characterG to normal after a delay
             setTimeout(() => {
-                if (currPlantTile && currPlantTile.firstChild) {
-                    currPlantTile.firstChild.src = "./assets/characterG_nor.png";
+                if (currCharacterGTile && currCharacterGTile.firstChild) {
+                    currCharacterGTile.firstChild.src = "./assets/characterG_nor.png";
                 }
             }, 1000);
-        } else if (currPlantTile && currPlantTile.firstChild && 
-            currPlantTile.firstChild.src.includes("characterG_happy")) {
-            // Hit the happy plant - add score
+        } else if (currCharacterGTile && currCharacterGTile.firstChild && 
+            currCharacterGTile.firstChild.src.includes("characterG_happy")) {
+            // Hit the happy characterG - add score
             score += pointValue;
             document.getElementById("score").innerText = score.toString(); //update score html
             
-            // Change mole to angry version
-            if (currMoleTile && currMoleTile.firstChild) {
-                currMoleTile.firstChild.src = "./assets/characterP_angry.png";
+            // Change characterP to angry version
+            if (currCharacterPTile && currCharacterPTile.firstChild) {
+                currCharacterPTile.firstChild.src = "./assets/characterP_angry.png";
                 
-                // Reset mole image after a delay
+                // Reset characterP image after a delay
                 setTimeout(() => {
-                    if (currMoleTile && currMoleTile.firstChild) {
-                        currMoleTile.firstChild.src = "./assets/characterP_nor.png";
+                    if (currCharacterPTile && currCharacterPTile.firstChild) {
+                        currCharacterPTile.firstChild.src = "./assets/characterP_nor.png";
                     }
                 }, 300);
             }
             
-            // Reset plant to normal after a delay
+            // Reset characterG to normal after a delay
             setTimeout(() => {
-                if (currPlantTile && currPlantTile.firstChild) {
-                    currPlantTile.firstChild.src = "./assets/characterG_nor.png";
+                if (currCharacterGTile && currCharacterGTile.firstChild) {
+                    currCharacterGTile.firstChild.src = "./assets/characterG_nor.png";
                 }
             }, 1000);
         }
@@ -235,8 +272,8 @@ function startGame() {
     if (gameTimer) clearInterval(gameTimer);
     
     // Start the game intervals
-    moleInterval = setInterval(setMole, 1000); // 1000 milliseconds = 1 second
-    plantInterval = setInterval(setPlant, 2000); // 2000 milliseconds = 2 seconds
+    moleInterval = setInterval(setCharacterP, 1000); // 1000 milliseconds = 1 second
+    plantInterval = setInterval(setCharacterG, 2000); // 2000 milliseconds = 2 seconds
     
     // Start the game timer
     gameTimer = setInterval(() => {
@@ -253,12 +290,12 @@ function startGame() {
         }
     }, 1000);
     
-    // Clear any existing moles or plants
-    if (currMoleTile) currMoleTile.innerHTML = "";
-    if (currPlantTile) currPlantTile.innerHTML = "";
+    // Clear any existing characterPs or characterGs
+    if (currCharacterPTile) currCharacterPTile.innerHTML = "";
+    if (currCharacterGTile) currCharacterGTile.innerHTML = "";
     
-    currMoleTile = null;
-    currPlantTile = null;
+    currCharacterPTile = null;
+    currCharacterGTile = null;
 }
 
 function enterFeverMode() {
@@ -269,8 +306,8 @@ function enterFeverMode() {
     if (plantInterval) clearInterval(plantInterval);
     
     // Start faster intervals for fever mode
-    moleInterval = setInterval(setMole, 500); // 500 milliseconds = 0.5 seconds
-    plantInterval = setInterval(setPlant, 1000); // 1000 milliseconds = 1 second
+    moleInterval = setInterval(setCharacterP, 500); // 500 milliseconds = 0.5 seconds
+    plantInterval = setInterval(setCharacterG, 1000); // 1000 milliseconds = 1 second
     
     // Update timer display to show fever mode
     document.getElementById("timer").innerText = timeLeft + "s FEVER!";
@@ -308,17 +345,18 @@ function restartGame() {
     if (plantInterval) clearInterval(plantInterval);
     if (gameTimer) clearInterval(gameTimer);
     
-    // Clear any existing moles or plants
-    if (currMoleTile) currMoleTile.innerHTML = "";
-    if (currPlantTile) currPlantTile.innerHTML = "";
+    // Clear any existing characterPs or characterGs
+    if (currCharacterPTile) currCharacterPTile.innerHTML = "";
+    if (currCharacterGTile) currCharacterGTile.innerHTML = "";
     
-    currMoleTile = null;
-    currPlantTile = null;
+    currCharacterPTile = null;
+    currCharacterGTile = null;
     
     // Reset game state
     gameStarted = false;
     gameOver = false;
     feverMode = false;
+    scoreSaved = false; // Reset score saved flag
     score = 0;
     timeLeft = 30;
     document.getElementById("score").innerText = score.toString();
@@ -326,6 +364,9 @@ function restartGame() {
     document.getElementById("timer").style.color = "#e52521"; // Reset to original color
     document.getElementById("startBtn").disabled = false;
     document.getElementById("restartBtn").disabled = true;
+    
+    // Hide save score input
+    document.getElementById("add-score").style.display = "none";
     
     // Remove any existing fever notice
     let feverNotice = document.getElementById("fever-notice");
@@ -343,9 +384,98 @@ function endGame() {
     // Set game over state
     gameOver = true;
     
+    // Store final score
+    finalScore = score;
+    
     // Update score display to show final score
     document.getElementById("score").innerText = "FINAL SCORE: " + score.toString();
     
     // Enable restart button
     document.getElementById("restartBtn").disabled = false;
+    
+    // Show save score option only if not already saved
+    if (!scoreSaved) {
+        document.getElementById("add-score").style.display = "block";
+        document.getElementById("player-name").focus();
+    }
+}
+
+function setupLeaderboard() {
+    // Save score button
+    document.getElementById("save-score").addEventListener("click", saveScore);
+    
+    // Set up real-time listener for leaderboard updates
+    db.collection('leaderboard')
+        .orderBy('score', 'desc')
+        .limit(10)
+        .onSnapshot((querySnapshot) => {
+            const leaderboard = [];
+            querySnapshot.forEach((doc) => {
+                leaderboard.push(doc.data());
+            });
+            displayLeaderboard(leaderboard);
+        }, (error) => {
+            console.error("Error listening to leaderboard:", error);
+        });
+}
+
+function loadLeaderboard() {
+    // This function is now handled by the real-time listener in setupLeaderboard
+    // Keep it for backward compatibility or manual refresh if needed
+}
+
+function displayLeaderboard(leaderboard) {
+    // Display leaderboard
+    const tbody = document.getElementById("leaderboard-body");
+    tbody.innerHTML = "";
+    
+    for (let i = 0; i < Math.min(leaderboard.length, 10); i++) {
+        const row = document.createElement("tr");
+        row.innerHTML = `
+            <td>${i + 1}</td>
+            <td>${leaderboard[i].name}</td>
+            <td>${leaderboard[i].score}</td>
+        `;
+        tbody.appendChild(row);
+    }
+}
+
+function saveScore() {
+    const nameInput = document.getElementById("player-name");
+    const name = nameInput.value.trim();
+    
+    if (name === "") {
+        alert("Please enter your name");
+        return;
+    }
+    
+    // Check if score already saved
+    if (scoreSaved) {
+        alert("Score already saved!");
+        return;
+    }
+    
+    // Save to Firestore
+    db.collection('leaderboard').add({
+        name: name,
+        score: finalScore,
+        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+    })
+    .then(() => {
+        // Mark score as saved
+        scoreSaved = true;
+        
+        // Hide save score input
+        document.getElementById("add-score").style.display = "none";
+        
+        // Clear input
+        nameInput.value = "";
+        
+        // Show confirmation
+        alert("Score saved to global leaderboard!");
+    })
+    .catch((error) => {
+        console.error("Error saving score to Firestore:", error);
+        alert("Failed to save score. Please check Firestore security rules.");
+    });
 }

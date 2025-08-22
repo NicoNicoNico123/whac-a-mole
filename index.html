@@ -5,22 +5,69 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Whac a G-spot</title>
     
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+    
     <script src="mole.js" type="module"></script>
-  <link rel="stylesheet" href="mole.css">
+    <link rel="stylesheet" href="mole.css">
 </head>
 <body>
-    <h1>Whac a G-spot</h1>
-    <h2 id="score">0</h2>
-    <h2 id="timer">30s</h2>
-    
-    <!-- Game Controls -->
-    <div id="controls">
-        <button id="startBtn">Start Game</button>
-        <button id="restartBtn">Restart Game</button>
-    </div>
-    
-    <!-- 3x3 -->
-    <div id="board">
+    <div id="game-container">
+        <!-- Header Section -->
+        <header id="game-header">
+            <div id="header-content">
+                <img id="game-logo" src="./assets/PlayCandi_logo.png" alt="PlayCandi Logo">
+                <h1 id="game-title">Whac a G-spot</h1>
+            </div>
+            <div id="game-stats">
+                <div class="stat-item">
+                    <span class="stat-label">Score</span>
+                    <span id="score" class="stat-value">0</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Time</span>
+                    <span id="timer" class="stat-value">30s</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Game Area -->
+        <main id="game-main">
+            <!-- Game Controls -->
+            <div id="game-controls">
+                <button id="startBtn" class="game-btn primary">Start Game</button>
+                <button id="restartBtn" class="game-btn secondary">Restart Game</button>
+            </div>
+
+            <!-- Game Board -->
+            <div id="game-board-container">
+                <div id="board"></div>
+            </div>
+        </main>
+
+        <!-- Sidebar with Leaderboard -->
+        <aside id="game-sidebar">
+            <div id="leaderboard-panel">
+                <h2>Leaderboard</h2>
+                <table id="leaderboard-table">
+                    <thead>
+                        <tr>
+                            <th>Rank</th>
+                            <th>Name</th>
+                            <th>Score</th>
+                        </tr>
+                    </thead>
+                    <tbody id="leaderboard-body">
+                        <!-- Leaderboard entries will be added here -->
+                    </tbody>
+                </table>
+                <div id="add-score" style="display: none;">
+                    <input type="text" id="player-name" placeholder="Enter your name">
+                    <button id="save-score">Save Score</button>
+                </div>
+            </div>
+        </aside>
     </div>
     
     <!-- Custom cursor for hit animation -->
