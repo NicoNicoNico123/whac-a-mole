@@ -11,7 +11,8 @@
       "Bash(npm run dev)",
       "WebFetch(domain:vitejs.dev)",
       "Bash(npx:*)",
-      "Bash(npm run preview)"
+      "Bash(npm run preview)",
+      "Bash(cp:*)"
     ],
     "deny": [],
     "ask": []
