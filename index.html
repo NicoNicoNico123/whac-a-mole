@@ -62,6 +62,7 @@
                 </table>
                 <div id="add-score" style="display: none;">
                     <input type="text" id="player-name" placeholder="Enter your name">
+                    <input type="email" id="player-email" placeholder="Enter your email (optional)">
                     <button id="save-score">Save Score</button>
                 </div>
             </div>
@@ -70,5 +71,17 @@
     
     <!-- Custom cursor for hit animation -->
     <div id="custom-cursor"></div>
+    
+    <!-- Success Popup -->
+    <div id="success-popup" class="popup-overlay">
+        <div class="popup-content">
+            <h2>🎉Saved Successfully!</h2>
+            <p>小遊戲完了，大享受開始！輸入優惠碼 <strong>whac5off</strong>，把快感神器帶回家～</p>
+            <div class="popup-buttons">
+                <a href="https://www.playcandi.shop/products" target="_blank" class="popup-btn primary">Visit PlayCandi.com</a>
+                <button id="close-popup" class="popup-btn secondary">Play Again</button>
+            </div>
+        </div>
+    </div>
 </body>
 </html>

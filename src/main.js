@@ -35,6 +35,9 @@ window.onload = function() {
     
     // Set up leaderboard
     setupLeaderboard();
+    
+    // Set up popup close button
+    setupPopup();
 }
 
 function setGame() {
@@ -431,7 +434,9 @@ function displayLeaderboard(leaderboard) {
 
 function saveScore() {
     const nameInput = document.getElementById("player-name");
+    const emailInput = document.getElementById("player-email");
     const name = nameInput.value.trim();
+    const email = emailInput.value.trim();
     
     if (name === "") {
         alert("Please enter your name");
@@ -444,12 +449,20 @@ function saveScore() {
         return;
     }
     
-    // Save to Firestore
-    addDoc(collection(db, 'leaderboard'), {
+    // Prepare score data
+    const scoreData = {
         name: name,
         score: finalScore,
         timestamp: serverTimestamp()
-    })
+    };
+    
+    // Add email only if provided
+    if (email) {
+        scoreData.email = email;
+    }
+    
+    // Save to Firestore
+    addDoc(collection(db, 'leaderboard'), scoreData)
     .then(() => {
         // Mark score as saved
         scoreSaved = true;
@@ -457,14 +470,37 @@ function saveScore() {
         // Hide save score input
         document.getElementById("add-score").style.display = "none";
         
-        // Clear input
+        // Clear inputs
         nameInput.value = "";
+        emailInput.value = "";
         
-        // Show confirmation
-        alert("Score saved to global leaderboard!");
+        // Show success popup
+        showSuccessPopup();
     })
     .catch((error) => {
         console.error("Error saving score to Firestore:", error);
         alert("Failed to save score. Please check Firestore security rules.");
     });
+}
+
+function setupPopup() {
+    // Close popup button
+    document.getElementById("close-popup").addEventListener("click", hideSuccessPopup);
+    
+    // Close popup when clicking overlay
+    document.getElementById("success-popup").addEventListener("click", function(e) {
+        if (e.target === this) {
+            hideSuccessPopup();
+        }
+    });
+}
+
+function showSuccessPopup() {
+    document.getElementById("success-popup").style.display = "flex";
+}
+
+function hideSuccessPopup() {
+    document.getElementById("success-popup").style.display = "none";
+    // Reset game state for play again
+    restartGame();
 }
